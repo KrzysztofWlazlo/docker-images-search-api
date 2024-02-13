@@ -16,7 +16,7 @@ class DockerImage
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 50)]
     #[Assert\NotBlank]
     private string $name;
 

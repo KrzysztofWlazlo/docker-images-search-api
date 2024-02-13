@@ -18,7 +18,6 @@ class SearchHistoryRepository extends ServiceEntityRepository
         parent::__construct($registry, SearchHistory::class);
     }
 
-    // Przykładowa metoda do wyszukiwania historii po nazwie obrazu
     public function findByImageName(string $imageName): array
     {
         return $this->createQueryBuilder('s')
@@ -29,5 +28,4 @@ class SearchHistoryRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    // Dodaj więcej metod zgodnie z wymaganiami aplikacji
 }

@@ -21,5 +21,4 @@ class DockerImageRepository extends ServiceEntityRepository
         parent::__construct($registry, DockerImage::class);
     }
 
-    // Custom methods
 }

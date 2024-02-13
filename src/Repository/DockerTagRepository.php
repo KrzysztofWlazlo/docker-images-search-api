@@ -21,5 +21,4 @@ class DockerTagRepository extends ServiceEntityRepository
         parent::__construct($registry, DockerTag::class);
     }
 
-    // Custom methods
 }

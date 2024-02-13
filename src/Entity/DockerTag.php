@@ -15,20 +15,20 @@ class DockerTag
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 50)]
     #[Assert\NotBlank]
     private string $tagName;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 50)]
     private string $status;
 
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $lastModified;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 50)]
     private string $architecture;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 50)]
     private string $os;
 
     #[ORM\Column(type: 'float')]
