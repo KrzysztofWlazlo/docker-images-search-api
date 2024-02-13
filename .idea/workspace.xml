@@ -4,14 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0005ea3b-2b64-45ba-96a6-3ee1a85d38c6" name="Changes" comment="Add entity and repository.">
+    <list default="true" id="0005ea3b-2b64-45ba-96a6-3ee1a85d38c6" name="Changes" comment="Edit size column and adding table creation migration.">
+      <change afterPath="$PROJECT_DIR$/src/Controller/DockerTagsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20240213072116.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20240213085547.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Entity/DockerImage.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/DockerImage.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Entity/DockerTag.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/DockerTag.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/DockerImageRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/DockerImageRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/DockerTagRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/DockerTagRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/SearchHistoryRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/SearchHistoryRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entity/SearchHistory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/SearchHistory.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,6 +115,8 @@
       <path value="$PROJECT_DIR$/vendor/symfony/cache-contracts" />
       <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
       <path value="$PROJECT_DIR$/vendor/api-platform/core" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-client-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-client" />
     </include_path>
   </component>
   <component name="ProjectColorInfo">{
@@ -161,7 +166,7 @@
       <workItem from="1707738342317" duration="789000" />
       <workItem from="1707745446613" duration="643000" />
       <workItem from="1707746424850" duration="7555000" />
-      <workItem from="1707755148118" duration="9119000" />
+      <workItem from="1707755148118" duration="19963000" />
     </task>
     <task id="LOCAL-00001" summary="Add entity and repository.">
       <option name="closed" value="true" />
@@ -171,7 +176,23 @@
       <option name="project" value="LOCAL" />
       <updated>1707763597174</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Edit size column and adding table creation migration.">
+      <option name="closed" value="true" />
+      <created>1707809930592</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1707809930592</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Edit size column and adding table creation migration.">
+      <option name="closed" value="true" />
+      <created>1707809970812</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1707809970812</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -206,6 +227,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initialize Symfony and API Platform project framework" />
     <MESSAGE value="Add entity and repository." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add entity and repository." />
+    <MESSAGE value="Edit size column and adding table creation migration." />
+    <option name="LAST_COMMIT_MESSAGE" value="Edit size column and adding table creation migration." />
   </component>
 </project>

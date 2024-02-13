@@ -18,11 +18,25 @@ class DockerImage
 
     #[ORM\Column(type: 'string', length: 50)]
     #[Assert\NotBlank]
+    private string $repository;
+
+    #[ORM\Column(type: 'string', length: 50)]
+    #[Assert\NotBlank]
     private string $name;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getRepository(): string
+    {
+        return $this->repository;
+    }
+
+    public function setRepository(string $repository): void
+    {
+        $this->repository = $repository;
     }
 
     public function getName(): string
