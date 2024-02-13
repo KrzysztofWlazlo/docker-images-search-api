@@ -53,7 +53,7 @@ class DockerTagsController extends AbstractController
         try {
             $response = $httpClient->request('GET', "https://hub.docker.com/v2/namespaces/{$namespace}/repositories/{$repository}/tags");
             $data = $response->toArray();
-        } catch (TransportExceptionInterface $e) {
+        } catch (ClientExceptionInterface $e) {
             return $this->json(['message' => 'No data found for the specified namespace/repository on Dockerhub or external API error.'], Response::HTTP_NOT_FOUND);
         }
 
