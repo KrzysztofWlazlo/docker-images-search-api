@@ -10,18 +10,24 @@ use App\Entity\SearchHistory;
 use App\Repository\DockerImageRepository;
 use App\Repository\DockerTagRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DockerService
 {
     private const DOCKER_HUB_API_BASE_URL = 'https://hub.docker.com/v2';
 
+    private $logger;
+
     public function __construct(
         private HttpClientInterface $httpClient,
         private EntityManagerInterface $em,
         private DockerImageRepository $dockerImageRepository,
-        private DockerTagRepository $dockerTagRepository
-    ) {}
+        private DockerTagRepository $dockerTagRepository,
+        LoggerInterface $logger
+    ) {
+        $this->logger = $logger;
+    }
 
     public function getTags(string $namespace, string $repository): array
     {
@@ -125,7 +131,7 @@ class DockerService
         $tag->setTagName($result['name'])
             ->setStatus($result['tag_status'])
             ->setLastModified(new \DateTime($result['tag_last_pushed']))
-            ->setArchitecture($result['images'][0]['architecture'])
+            ->setArchitecture(($result['images'][0]['architecture']) ?? 'unknown')
             ->setOs($result['images'][0]['os'])
             ->setSize(round($result['images'][0]['size'] / 1024 / 1024, 2))
             ->setImage($dockerImage);
@@ -145,5 +151,69 @@ class DockerService
 
         $this->em->persist($searchHistory);
         $this->em->flush();
+    }
+
+    public function updateTags(): void
+    {
+        $dockerImages = $this->dockerImageRepository->findAll();
+
+        foreach ($dockerImages as $dockerImage) {
+            $namespace = $dockerImage->getName();
+            $repository = $dockerImage->getRepository();
+            $url = self::DOCKER_HUB_API_BASE_URL . "/namespaces/{$namespace}/repositories/{$repository}/tags";
+
+            try {
+                $response = $this->httpClient->request('GET', $url);
+                $data = $response->toArray();
+
+                $apiTags = [];
+                foreach ($data['results'] as $result) {
+                    $apiTags[$result['name']] = $result;
+                }
+
+                $existingTags = $this->dockerTagRepository->findBy(['image' => $dockerImage]);
+                $existingTagsIndex = [];
+                foreach ($existingTags as $tag) {
+                    $existingTagsIndex[$tag->getTagName()] = $tag;
+                }
+
+                foreach ($apiTags as $tagName => $result) {
+                    if (array_key_exists($tagName, $existingTagsIndex)) {
+                        $tag = $existingTagsIndex[$tagName];
+                        $lastModified = new \DateTime($result['tag_last_pushed']);
+                        if ($tag->getLastModified() != $lastModified) {
+                            $tag->setLastModified($lastModified);
+                        }
+                        if ($tag->getStatus() != $result['tag_status']) {
+                            $tag->setStatus($result['tag_status']);
+                        }
+                        $architecture = $result['images'][0]['architecture'] ?? 'unknown';
+                        if ($tag->getArchitecture() != $architecture) {
+                            $tag->setArchitecture($architecture);
+                        }
+                        $os = $result['images'][0]['os'];
+                        if ($tag->getOs() != $os) {
+                            $tag->setOs($os);
+                        }
+                        $size = round($result['images'][0]['size'] / 1024 / 1024, 2);
+                        if ($tag->getSize() != $size) {
+                            $tag->setSize($size);
+                        }
+                    } else {
+                        $tag = $this->createOrUpdateTagFromResult($result, $dockerImage);
+                    }
+                }
+
+                foreach ($existingTagsIndex as $tagName => $tag) {
+                    if (!array_key_exists($tagName, $apiTags)) {
+                        $this->em->remove($tag);
+                    }
+                }
+
+                $this->em->flush();
+            } catch (\Exception $e) {
+                $this->logger->error("Exception occurred while updating tags for image {$namespace}/{$repository}: {$e->getMessage()}");
+            }
+        }
     }
 }

@@ -4,14 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0005ea3b-2b64-45ba-96a6-3ee1a85d38c6" name="Changes" comment="Implement feature to display Docker images by tag and create DockerService">
-      <change afterPath="$PROJECT_DIR$/migrations/Version20240214093020.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Controller/SearchHistoryController.php" afterDir="false" />
+    <list default="true" id="0005ea3b-2b64-45ba-96a6-3ee1a85d38c6" name="Changes" comment="Extend DockerService with error handling and search history recording">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/DockerTagsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/DockerTagsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entity/SearchHistory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/SearchHistory.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/SearchHistoryRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/SearchHistoryRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Service/DockerService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/DockerService.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,7 +21,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="develop" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -129,7 +123,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "develop",
+    "git-widget-placeholder": "master",
     "last_opened_file_path": "/var/www/html/docker-images-search-api",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -163,7 +157,7 @@
       <workItem from="1707738342317" duration="789000" />
       <workItem from="1707745446613" duration="643000" />
       <workItem from="1707746424850" duration="7555000" />
-      <workItem from="1707755148118" duration="47356000" />
+      <workItem from="1707755148118" duration="48153000" />
     </task>
     <task id="LOCAL-00001" summary="Add entity and repository.">
       <option name="closed" value="true" />
@@ -213,7 +207,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707841652129</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Extend DockerService with error handling and search history recording">
+      <option name="closed" value="true" />
+      <created>1707908446262</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1707908446262</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -252,6 +254,7 @@
     <MESSAGE value="Refine entity definitions, migrations and implement displaying all tags for given name and repository" />
     <MESSAGE value="Fix Exception No data found" />
     <MESSAGE value="Implement feature to display Docker images by tag and create DockerService" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implement feature to display Docker images by tag and create DockerService" />
+    <MESSAGE value="Extend DockerService with error handling and search history recording" />
+    <option name="LAST_COMMIT_MESSAGE" value="Extend DockerService with error handling and search history recording" />
   </component>
 </project>
