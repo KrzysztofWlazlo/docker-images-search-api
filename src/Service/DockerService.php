@@ -16,6 +16,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class DockerService
 {
     private const DOCKER_HUB_API_BASE_URL = 'https://hub.docker.com/v2';
+
     private $logger;
 
     public function __construct(
@@ -161,39 +162,58 @@ class DockerService
             $repository = $dockerImage->getRepository();
             $url = self::DOCKER_HUB_API_BASE_URL . "/namespaces/{$namespace}/repositories/{$repository}/tags";
 
-            $response = $this->fetchDockerTags($url); // Zakładam, że masz taką metodę zaimplementowaną
+            try {
+                $response = $this->httpClient->request('GET', $url);
+                $data = $response->toArray();
 
-            if ($response) {
                 $apiTags = [];
-                foreach ($response['results'] as $result) {
+                foreach ($data['results'] as $result) {
                     $apiTags[$result['name']] = $result;
                 }
 
                 $existingTags = $this->dockerTagRepository->findBy(['image' => $dockerImage]);
-                $existingTagsMap = [];
+                $existingTagsIndex = [];
                 foreach ($existingTags as $tag) {
-                    $existingTagsMap[$tag->getTagName()] = $tag;
+                    $existingTagsIndex[$tag->getTagName()] = $tag;
                 }
 
-                foreach ($existingTags as $tag) {
-                    if (!isset($apiTags[$tag->getTagName()])) {
+                foreach ($apiTags as $tagName => $result) {
+                    if (array_key_exists($tagName, $existingTagsIndex)) {
+                        $tag = $existingTagsIndex[$tagName];
+                        $lastModified = new \DateTime($result['tag_last_pushed']);
+                        if ($tag->getLastModified() != $lastModified) {
+                            $tag->setLastModified($lastModified);
+                        }
+                        if ($tag->getStatus() != $result['tag_status']) {
+                            $tag->setStatus($result['tag_status']);
+                        }
+                        $architecture = $result['images'][0]['architecture'] ?? 'unknown';
+                        if ($tag->getArchitecture() != $architecture) {
+                            $tag->setArchitecture($architecture);
+                        }
+                        $os = $result['images'][0]['os'];
+                        if ($tag->getOs() != $os) {
+                            $tag->setOs($os);
+                        }
+                        $size = round($result['images'][0]['size'] / 1024 / 1024, 2);
+                        if ($tag->getSize() != $size) {
+                            $tag->setSize($size);
+                        }
+                    } else {
+                        $tag = $this->createOrUpdateTagFromResult($result, $dockerImage);
+                    }
+                }
+
+                foreach ($existingTagsIndex as $tagName => $tag) {
+                    if (!array_key_exists($tagName, $apiTags)) {
                         $this->em->remove($tag);
                     }
                 }
 
-                foreach ($apiTags as $tagName => $tagData) {
-                    if (isset($existingTagsMap[$tagName])) {
-                        $tag = $existingTagsMap[$tagName];
-                    } else {
-                        $tag = $this->createOrUpdateTagFromResult($tagData, $dockerImage);
-                    }
-                }
-
                 $this->em->flush();
-            } else {
-                $this->logger->error("Failed to fetch tags for image {$namespace}/{$repository}");
+            } catch (\Exception $e) {
+                $this->logger->error("Exception occurred while updating tags for image {$namespace}/{$repository}: {$e->getMessage()}");
             }
         }
     }
-
 }

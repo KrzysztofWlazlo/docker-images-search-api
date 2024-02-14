@@ -1,0 +1,215 @@
+{
+	"info": {
+		"_postman_id": "70ba9ed7-46c6-4236-92b2-1084acfe5cd4",
+		"name": "docker-images-search-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32904003"
+	},
+	"item": [
+		{
+			"name": "getTagsOfImage",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/docker/tags/namespace/:namespace/repository/:repository",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"docker",
+						"tags",
+						"namespace",
+						":namespace",
+						"repository",
+						":repository"
+					],
+					"query": [
+						{
+							"key": "namespace",
+							"value": null,
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "namespace",
+							"value": "pytorch"
+						},
+						{
+							"key": "repository",
+							"value": "pytorch"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTagDetailsOfImage",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/docker/tags/namespace/:namespace/repository/:repository/tag/:tag",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"docker",
+						"tags",
+						"namespace",
+						":namespace",
+						"repository",
+						":repository",
+						"tag",
+						":tag"
+					],
+					"variable": [
+						{
+							"key": "namespace",
+							"value": "ollama"
+						},
+						{
+							"key": "repository",
+							"value": "ollama"
+						},
+						{
+							"key": "tag",
+							"value": "0.1.23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "searchHistoryByImageName",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/search/history/namespace/:namespace/repository/:repository",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"search",
+						"history",
+						"namespace",
+						":namespace",
+						"repository",
+						":repository"
+					],
+					"variable": [
+						{
+							"key": "namespace",
+							"value": "paketobuildpacks"
+						},
+						{
+							"key": "repository",
+							"value": "build"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "searchHistoryByImageNameAndTag",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/search/history/namespace/:namespace/repository/:repository/tag/:tag",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"search",
+						"history",
+						"namespace",
+						":namespace",
+						"repository",
+						":repository",
+						"tag",
+						":tag"
+					],
+					"variable": [
+						{
+							"key": "namespace",
+							"value": "pytorch"
+						},
+						{
+							"key": "repository",
+							"value": "torchserve"
+						},
+						{
+							"key": "tag",
+							"value": "0.8.2-gpu"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "searchHistoryByTagName",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/search/history/tag/:tagName",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"search",
+						"history",
+						"tag",
+						":tagName"
+					],
+					"variable": [
+						{
+							"key": "tagName",
+							"value": "latest"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:8000/",
+			"type": "string"
+		}
+	]
+}
