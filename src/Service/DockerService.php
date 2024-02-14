@@ -10,18 +10,23 @@ use App\Entity\SearchHistory;
 use App\Repository\DockerImageRepository;
 use App\Repository\DockerTagRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DockerService
 {
     private const DOCKER_HUB_API_BASE_URL = 'https://hub.docker.com/v2';
+    private $logger;
 
     public function __construct(
         private HttpClientInterface $httpClient,
         private EntityManagerInterface $em,
         private DockerImageRepository $dockerImageRepository,
-        private DockerTagRepository $dockerTagRepository
-    ) {}
+        private DockerTagRepository $dockerTagRepository,
+        LoggerInterface $logger
+    ) {
+        $this->logger = $logger;
+    }
 
     public function getTags(string $namespace, string $repository): array
     {
@@ -125,7 +130,7 @@ class DockerService
         $tag->setTagName($result['name'])
             ->setStatus($result['tag_status'])
             ->setLastModified(new \DateTime($result['tag_last_pushed']))
-            ->setArchitecture($result['images'][0]['architecture'])
+            ->setArchitecture(($result['images'][0]['architecture']) ?? 'unknown')
             ->setOs($result['images'][0]['os'])
             ->setSize(round($result['images'][0]['size'] / 1024 / 1024, 2))
             ->setImage($dockerImage);
@@ -146,4 +151,49 @@ class DockerService
         $this->em->persist($searchHistory);
         $this->em->flush();
     }
+
+    public function updateTags(): void
+    {
+        $dockerImages = $this->dockerImageRepository->findAll();
+
+        foreach ($dockerImages as $dockerImage) {
+            $namespace = $dockerImage->getName();
+            $repository = $dockerImage->getRepository();
+            $url = self::DOCKER_HUB_API_BASE_URL . "/namespaces/{$namespace}/repositories/{$repository}/tags";
+
+            $response = $this->fetchDockerTags($url); // Zakładam, że masz taką metodę zaimplementowaną
+
+            if ($response) {
+                $apiTags = [];
+                foreach ($response['results'] as $result) {
+                    $apiTags[$result['name']] = $result;
+                }
+
+                $existingTags = $this->dockerTagRepository->findBy(['image' => $dockerImage]);
+                $existingTagsMap = [];
+                foreach ($existingTags as $tag) {
+                    $existingTagsMap[$tag->getTagName()] = $tag;
+                }
+
+                foreach ($existingTags as $tag) {
+                    if (!isset($apiTags[$tag->getTagName()])) {
+                        $this->em->remove($tag);
+                    }
+                }
+
+                foreach ($apiTags as $tagName => $tagData) {
+                    if (isset($existingTagsMap[$tagName])) {
+                        $tag = $existingTagsMap[$tagName];
+                    } else {
+                        $tag = $this->createOrUpdateTagFromResult($tagData, $dockerImage);
+                    }
+                }
+
+                $this->em->flush();
+            } else {
+                $this->logger->error("Failed to fetch tags for image {$namespace}/{$repository}");
+            }
+        }
+    }
+
 }
