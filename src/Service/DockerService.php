@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Entity\DockerImage;
 use App\Entity\DockerTag;
+use App\Entity\SearchHistory;
 use App\Repository\DockerImageRepository;
 use App\Repository\DockerTagRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,10 +26,19 @@ class DockerService
     public function getTags(string $namespace, string $repository): array
     {
         $dockerImage = $this->dockerImageRepository->findOneBy(['name' => $namespace, 'repository' => $repository]);
+        $imageName = $namespace . '/' . $repository;
 
-        if ($dockerImage) {
+        $searchHistoryExists = $this->em->getRepository(SearchHistory::class)->findOneBy([
+            'imageName' => $imageName,
+            'searchAllTags' => true
+        ]);
+
+        if ($searchHistoryExists) {
             $tags = $this->dockerTagRepository->findBy(['image' => $dockerImage]);
-            return array_map(fn($tag) => $this->formatTagData($tag, "$namespace/$repository"), $tags);
+            foreach ($tags as $tag) {
+                $this->saveSearchHistory($imageName, $tag->getTagName(), true);
+            }
+            return array_map(fn($tag) => $this->formatTagData($tag, $imageName), $tags);
         }
 
         $url = self::DOCKER_HUB_API_BASE_URL . "/namespaces/{$namespace}/repositories/{$repository}/tags";
@@ -46,7 +56,8 @@ class DockerService
             $formattedTags = [];
             foreach ($data['results'] as $result) {
                 $tag = $this->createOrUpdateTagFromResult($result, $dockerImage);
-                $formattedTags[] = $this->formatTagData($tag, "$namespace/$repository");
+                $formattedTags[] = $this->formatTagData($tag, $imageName);
+                $this->saveSearchHistory($imageName, $tag->getTagName(), true);
             }
             $this->em->flush();
 
@@ -59,39 +70,40 @@ class DockerService
     public function getTagDetails(string $namespace, string $repository, string $tagName): array
     {
         $dockerImage = $this->dockerImageRepository->findOneBy(['name' => $namespace, 'repository' => $repository]);
+        $imageName = $namespace . '/' . $repository;
 
         if ($dockerImage) {
             $tag = $this->dockerTagRepository->findOneBy(['image' => $dockerImage, 'tagName' => $tagName]);
             if ($tag) {
-                return $this->formatTagData($tag, "$namespace/$repository");
+                $this->saveSearchHistory($imageName, $tag->getTagName(), false);
+                return $this->formatTagData($tag, $imageName);
             }
         }
 
-        $url = self::DOCKER_HUB_API_BASE_URL . "/repositories/{$namespace}/{$repository}/tags/{$tagName}";
+        $url = self::DOCKER_HUB_API_BASE_URL . "/namespaces/{$namespace}/repositories/{$repository}/tags/{$tagName}";
         try {
             $response = $this->httpClient->request('GET', $url);
-            if ($response->getStatusCode() === 200) {
-                $data = $response->toArray();
 
-                if (!$dockerImage) {
-                    $dockerImage = new DockerImage();
-                    $dockerImage->setName($namespace);
-                    $dockerImage->setRepository($repository);
-                    $this->em->persist($dockerImage);
-                }
+            $data = $response->toArray();
 
-                $tag = $this->createOrUpdateTagFromResult($data, $dockerImage);
-                $this->em->flush();
-
-                return $this->formatTagData($tag, "$namespace/$repository");
+            if (!$dockerImage) {
+                $dockerImage = new DockerImage();
+                $dockerImage->setName($namespace);
+                $dockerImage->setRepository($repository);
+                $this->em->persist($dockerImage);
             }
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to fetch tag details from Docker Hub: ' . $e->getMessage());
-        }
 
-        return [];
+            $tag = $this->createOrUpdateTagFromResult($data, $dockerImage);
+            $this->em->flush();
+            $this->saveSearchHistory($imageName, $tag->getTagName(), false);
+
+            return $this->formatTagData($tag, $imageName);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to fetch tags from Docker Hub: ' . $e->getMessage());
+        }
     }
-    private function formatTagData(DockerTag $tag, $imageName): array
+
+    private function formatTagData(DockerTag $tag, string $imageName): array
     {
         return [
             'imageName' => $imageName,
@@ -121,5 +133,17 @@ class DockerService
         $this->em->persist($tag);
 
         return $tag;
+    }
+
+    public function saveSearchHistory(string $imageName, string $tagName,bool $searchAllTags): void
+    {
+        $searchHistory = new SearchHistory();
+        $searchHistory->setImageName($imageName);
+        $searchHistory->setTagName($tagName);
+        $searchHistory->setSearchedAt(new \DateTime());
+        $searchHistory->setSearchAllTags($searchAllTags);;
+
+        $this->em->persist($searchHistory);
+        $this->em->flush();
     }
 }

@@ -24,6 +24,9 @@ class SearchHistory
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $searchedAt;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $searchAllTags;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,5 +63,15 @@ class SearchHistory
     {
         $this->searchedAt = $searchedAt;
         return $this;
+    }
+
+    public function isSearchAllTags(): bool
+    {
+        return $this->searchAllTags;
+    }
+
+    public function setSearchAllTags(bool $searchAllTags): void
+    {
+        $this->searchAllTags = $searchAllTags;
     }
 }

@@ -8,9 +8,6 @@ use App\Entity\SearchHistory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<SearchHistory>
- */
 class SearchHistoryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -20,12 +17,36 @@ class SearchHistoryRepository extends ServiceEntityRepository
 
     public function findByImageName(string $imageName): array
     {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.imageName = :val')
-            ->setParameter('val', $imageName)
-            ->orderBy('s.id', 'ASC')
+        return $this->createQueryBuilder('sh')
+            ->select('sh.id', 'sh.imageName', 'sh.tagName', 'sh.searchedAt')
+            ->where('sh.imageName = :imageName')
+            ->setParameter('imageName', $imageName)
+            ->orderBy('sh.searchedAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
+    public function findByTagName(string $tagName): array
+    {
+        return $this->createQueryBuilder('sh')
+            ->select('sh.id', 'sh.imageName', 'sh.tagName', 'sh.searchedAt')
+            ->where('sh.tagName = :tagName')
+            ->setParameter('tagName', $tagName)
+            ->orderBy('sh.searchedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByImageNameAndTagName(string $imageName, string $tagName): array
+    {
+        return $this->createQueryBuilder('sh')
+            ->select('sh.id', 'sh.imageName', 'sh.tagName', 'sh.searchedAt')
+            ->where('sh.imageName = :imageName')
+            ->andWhere('sh.tagName = :tagName')
+            ->setParameter('imageName', $imageName)
+            ->setParameter('tagName', $tagName)
+            ->orderBy('sh.searchedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
